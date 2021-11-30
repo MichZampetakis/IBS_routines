@@ -1,0 +1,489 @@
+!************************************************************
+!
+! DR lattice based on V67_short
+!
+! Rematch for different dispersion suppressors
+! All bending angles the same: ang=2*pi/Nd
+!
+! Different wiggler options
+! 
+! Modified started: Aug 2010
+!
+!**************************************************************
+CREATE,TABLE=TAB,COLUMN=Bw,VRF,dq1,dq2,ALFA,U0,i, diff1, diff2, diff3, diff4, ex0n, ey0n, sp0, ss0, exn, eyn, spp, sss, et, IBSx, IBSy, IBSl,taux,tauy,taul,qs;
+Eo=2.86;
+E0=2.86;
+
+ang=2*pi/(100*2);
+!ang=2*pi/(90*2);
+call,file="./DR_macros.madx";
+! Sequece definitions
+! **********************************************************************************
+
+TME: LINE = (GTMER, D1 
+, S2X2, D2, GQF1, D3, GQF2, D4, S2Y1, S2Y1, D4, GQF2, D3, GQF1, D2, S2X2, D1 , GTMEL);
+
+FODOw: LINE=(QFW1,WD1,WigglerSinusoidal,WD2,QDW1,QDW1,WD1,WigglerSinusoidal,WD2,QFW1);
+
+DISP22: LINE = (MH3, QFW1, WD01, MRF, WD02, QDW02, QDW02, WD0, QFW02, QFW02,  
+D03, QM412, D02, QM312, D01, MH2, GTMELDS, GTMERDS, DM3, QM12, DM4, GQF2DS2, D3, GQF1DS2, D2,SM1, D1, GTMEL,MH1);
+
+DISP11: LINE = (MH1, GTMER, D1, SM1, D2, GQF1DS, D3, GQF2DS, DM4, QM1, DM3, 
+GTMELDS, GTMERDS, MH2, D01, QM31, D02, QM41, D03,QFW0, QFW0, WD0, QDW0, QDW0, WD0, QFW1, MH3);
+
+ARC: LINE = ( 47*TME);
+!ARC: LINE = ( 42*TME);
+STRAIGHT: LINE = (13*FODOw);
+!RING: LINE = (DISP11, STRAIGHT, DISP22,ARC,DISP11,STRAIGHT,DISP22,ARC);
+RING: LINE = (STRAIGHT, DISP22,ARC,DISP11,STRAIGHT,DISP22,ARC,DISP11);
+
+! Element definitions
+!*************************************************************************************
+
+Ldip=0.58*0.5;
+
+GTMEL: SBEND, L=Ldip, ANGLE=ang, K1=-1.1, E1=ang, E2= 0.0; !stef:I don't think that e1=ang, i think it is e1=2ang (regarding the sector magnet defitnition in madx guide).
+GTMER: SBEND, L=Ldip, ANGLE=ang, K1=-1.1, E1=0.0, E2=ang;	!same for e2...
+
+GTMELDS: SBEND, L=Ldip, ANGLE=ang, K1=-1.1, E1=ang, E2= 0.0;
+GTMERDS: SBEND, L=Ldip, ANGLE=ang, K1=-1.1, E1=0.0, E2= ang;
+
+D1: DRIFT, L=0.08;
+D2: DRIFT, L=0.08;	
+D3: DRIFT, L=0.08;
+D4: DRIFT, L=0.1;
+
+WD0: DRIFT, L=2.15;
+WD01: DRIFT, L=2.15/2;
+WD02: DRIFT, L=2.15/2;
+
+! FODO WITH WIGGLERS
+! ******************************
+LQ1w=0.1;
+LQ2w=0.1;
+
+QFw1: QUADRUPOLE, L=LQ1w, K1 := KQFw;
+QDw1: QUADRUPOLE, L=LQ2w, K1 := KQDw;
+
+Lwd1=0.6;
+Lwd2=0.2;
+
+WD1: DRIFT,L = Lwd1;
+WD2: DRIFT,L = Lwd2;
+
+!DM1: DRIFT, L=0.08;
+/**
+DM1: DRIFT, L=0.31;    !0.08+0.15+0.08;
+DM2: DRIFT, L=0.08;**/
+DM3: DRIFT, L=0.35;
+!DM4: DRIFT, L=0.1;
+DM4: DRIFT, L=0.35;   !0.1+0.15+0.1;
+SM1: DRIFT, L=0.15;
+!SM2: DRIFT, L=0.15;
+D01: DRIFT, L=0.2;
+D02: DRIFT, L=0.2;
+D03: DRIFT, L=0.2;
+!D04: DRIFT, L=0.2+0.2;
+!D05: DRIFT, L=0.2;
+MH1: MARKER;
+MH2: MARKER;
+MH3: MARKER;
+MRF: MARKER;
+! Generated drifts:
+Minj: MARKER;
+Mextr: MARKER;
+
+KQF1=-3.56684;
+KQF2=6.96750;
+
+KS2X2=100;
+KS2Y1=-100;
+
+KQFw =1.55261226 ;
+KQDw =-1.301643467 ;
+
+KQF1DS=-4.446544770327;
+KQF2DS=7.694366543502;
+KQFW0=2;
+KQDW0=-3;
+
+KQM1=8;
+KQM31=8;
+KQM41=-8;
+
+KQF1DS2=-4.446544770327;
+KQF2DS2=7.694366543502;
+KQFW02=2;
+KQDW02=-3;
+KQM12=8;
+KQM312=8;
+KQM412=-8;
+
+GQF1: QUADRUPOLE, L=0.2, K1:=KQF1;
+GQF2: QUADRUPOLE, L=0.2, K1:=KQF2;
+
+S2X2: SEXTUPOLE, L=0.15, K2:=KS2X2;
+S2Y1: SEXTUPOLE, L=0.075, K2:=KS2Y1;
+
+QFW1: QUADRUPOLE, L=0.1, K1:=KQFw;
+QDW1: QUADRUPOLE, L=0.1, K1:=KQDw;
+
+
+GQF1DS: QUADRUPOLE, L=0.2, K1:=KQF1DS;
+GQF2DS: QUADRUPOLE, L=0.2, K1:=KQF2DS;
+QFW0: QUADRUPOLE, L=0.1, K1:=KQFW0;
+QDW0: QUADRUPOLE, L=0.1, K1:=KQDW0;
+QM1: QUADRUPOLE, L=0.2, K1:=KQM1;
+QM31: QUADRUPOLE, L=0.305, K1:=KQM31;
+QM41: QUADRUPOLE, L=0.305, K1:=KQM41;
+
+GQF1DS2: QUADRUPOLE, L=0.2, K1:=KQF1DS2;
+GQF2DS2: QUADRUPOLE, L=0.2, K1:=KQF2DS2;
+QFW02: QUADRUPOLE, L=0.1, K1:=KQFW02;
+QDW02: QUADRUPOLE, L=0.1, K1:=KQDW02;
+QM12: QUADRUPOLE, L=0.2, K1:=KQM12;
+QM312: QUADRUPOLE, L=0.3, K1:=KQM312;
+QM412: QUADRUPOLE, L=0.3, K1:=KQM412;
+
+VRFTOT1:=4.9;
+VRFTOT2:=4.4;
+LGRF1:=3.36086957E-01;
+LGRF2:=2.98109628E-01;
+HARMON2=2827;
+HARMON1=1454;
+
+Nb=4.4e+09;
+
+beam, particle=positron, energy=2.86, bunched, npart = Nb, kbunch = 1, EX = 1.012064e-10, EY = 6.616722e-13, ET = 7.78e+03, SIGT = 0.00158, SIGE = 1.721435e-03, radiate = FALSE;
+
+
+SELECT,FLAG=TWISS,RANGE=#S/#E, 
+       COLUMN=NAME, KEYWORD, S, L, ANGLE, K1L, BETX, ALFX, MUX, BETY, ALFY, MUY, DX, DPX, DY, DPY;
+
+/******************
+Initial tme phase advances: Q1=0.4519166642, Q2=0.05641666602
+Initial fodo phase advances: Q1=0.3273278433, Q2=0.151087893
+******************/
+
+Bw=2.5;
+n=0;
+mm=0;
+
+lw=0.05;
+
+q1tme=0.408;
+q2tme=0.05;
+
+q1fodo=0.256;
+q2fodo=0.1055;
+
+use period=TME;
+exec, MATCHTME(TME,q1tme,q2tme,KQF1,KQF2);
+toltme=tar;
+
+savebeta,label=betatme,place=#e,sequence=TME;
+twiss,sequence=TME; !,file=tme.dat;
+!PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,interpolate=true;
+
+Nper=2/lw-1;
+show,Nper;
+exec,WigglerSinusoidal($Nper,Bw,lw,Eo);
+
+use period=FODOw;
+exec, MATCHFODOw(FODOw,q1fodo,q2fodo,KQFw,KQDw);
+!tolfodo=tar;
+twiss,file="MADX_Output/mpla.dat";
+
+!PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,interpolate=true;
+fodolength=table(summ,length);
+
+exec,LAYOUT(FODO);
+
+if (tolfodo < E-10)
+{
+show,tolfodo; 
+}
+
+savebeta,label=betafodow,place=#e,sequence=FODOw;
+twiss,sequence=FODOw; !,file=fodowig.dat;
+
+use period=DISP11;
+use period=DISP22;
+use period=ARC;
+use period=STRAIGHT;
+use period=RING;
+
+MATCH,SEQUENCE=DISP11,beta0=betatme; 
+	CONSTRAINT,range=#e,dx=betafodow->dx,dpx=(betafodow->dpx);
+	CONSTRAINT,range=#e,betx=betafodow->betx,bety=betafodow->bety,alfx=(betafodow->alfx),alfy=(betafodow->alfy);
+	VARY,NAME=KQF1DS,STEP=1E-6; !,lower=0;
+	VARY,NAME=KQF2DS,STEP=1E-6; !,lower=0;
+	VARY,NAME=KQM1,STEP=1E-6; !,lower=0;
+	VARY,NAME=KQM31,STEP=1E-6;	!,upper=0;
+	VARY,NAME=KQM41,STEP=1E-6;	!,upper=0;
+	VARY,NAME=KQFW0,STEP=1E-6; ! ,upper=0;
+	VARY,NAME=KQDW0,STEP=1E-6; ! ,upper=0;
+	!LMDIF,CALLS=500,TOLERANCE=1e-15;
+	JACOBIAN,CALLS=30,TOLERANCE=1.e-20;
+	JACOBIAN,CALLS=30,TOLERANCE=1.e-20;
+ENDMATCH;
+toldisp11=tar;
+twiss,sequence=DISP11,beta0=betatme;
+!PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,interpolate=true;
+
+exec,LAYOUT(DISP1);
+
+KQF1DS2=KQF1DS;
+KQF2DS2=KQF2DS;
+KQM12=KQM1;
+KQM312=KQM31;
+KQM412=KQM41;
+KQFW02=KQFW0;
+KQDW02=KQDW0;
+
+MATCH,SEQUENCE=DISP22,beta0=betafodow; 
+	CONSTRAINT,range=#e,dx=betatme->dx,dpx=(betatme->dpx);
+	CONSTRAINT,range=#e,betx=betatme->betx,bety=betatme->bety,alfx=(betatme->alfx),alfy=(betatme->alfy);
+	VARY,NAME=KQF1DS2,STEP=1E-6; !,lower=0;
+	VARY,NAME=KQF2DS2,STEP=1E-6; !,lower=0;
+	VARY,NAME=KQM12,STEP=1E-6; !,lower=0;
+	VARY,NAME=KQM312,STEP=1E-6;	!,upper=0;
+	VARY,NAME=KQM412,STEP=1E-6;	!,upper=0;
+	VARY,NAME=KQFW02,STEP=1E-6; ! ,upper=0;
+	VARY,NAME=KQDW02,STEP=1E-6; ! ,upper=0;
+	!LMDIF,CALLS=500,TOLERANCE=1e-15;
+	JACOBIAN,CALLS=30,TOLERANCE=1.e-20;
+	JACOBIAN,CALLS=30,TOLERANCE=1.e-20;
+ENDMATCH;
+toldisp22=tar;
+twiss,sequence=DISP22,beta0=betafodow;
+!PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,interpolate=true;
+
+twiss,sequence=RING,file="MADX_Output/ring_withchrom.dat";
+save,sequence=RING,file="MADX_Output/ring-natural_2GHz.seq";
+
+call,file="MADX_Output/ring-natural_2GHz.seq";
+use,sequence=ring;
+
+save,sequence=RING,file="MADX_Output/ring-chromcor-noRF_2GHz.seq";
+
+
+use,sequence=RING;
+
+VRFTOT:=4.5;
+!VRFTOT:=6.5;
+
+LGRF:=3.36086957E-01;
+LGRF:=5E-01;
+
+HARMON=2852;
+
+RF: RFCAVITY, L=0.1E-8, VOLT=VRFTOT, LAG:=LGRF,HARMON=HARMON;
+
+seqedit,sequence=RING;
+	replace,element=MRF[1],by=RF;
+endedit;
+
+use,sequence=ring;
+
+exec, MATCHLAG(RING,LGRF);
+twiss,chrom,sequence=RING,file="MADX_Output/twiss_2GHz.dr.nody.dat";
+
+save,sequence=RING,file="MADX_Output/DR.newlattice_2GHz.seq";
+
+use,sequence=RING;
+
+seqedit,sequence=RING;
+	replace,element=MRF[1],by=RF;
+endedit;
+
+use,sequence=ring;
+
+exec, MATCHLAG(RING,LGRF);
+twiss,chrom,sequence=RING,file="MADX_Output/twiss_2GHz.dr.nody.dat";
+!PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX; !,interpolate=true;
+
+use,sequence=RING;
+
+U0=0.;
+value,KQF1,KQF2,KQFw,KQDw,KQF1DS,KQF2DS,KQM1,KQM31,KQM41,KQFW0,KQDW0,KQF1DS2,KQF2DS2,KQM12,KQM312,KQM412,KQFW02,KQDW02,KS2X2,KS2Y1;
+
+kmis=0.205e-05;
+exec, MISALIGNMENTS(RING,kmis);
+twiss,chrom,centre,sequence=RING;
+
+I1=table(summ,synch_1);
+I2=table(summ,synch_2);
+I3=table(summ,synch_3);
+I4=table(summ,synch_4);
+I5=table(summ,synch_5);
+RCIR=table(summ,length);
+ap=table(summ,alfa);
+Cgg=0.0000884628;
+
+VRF=VRFTOT;
+h=HARMON;
+gt=table(summ,gammatr);
+gamma=beam->gamma;
+betar=beam->beta;
+
+etap=abs(1/gt^2-1/gamma^2);
+Qs=sqrt(h*etap/2/pi/betar^2/E0*(VRf/1000)*cos(asin(U0/(VRf/1000))));
+
+
+!!! Here I put radiation on in order to calculate the equilibrium beam properties
+!beam, npart=Nb, radiate; 
+
+
+!! i want to start the IBS calculations from the equilibrium beam values and for this I redefine the beam as this will be the input to the ibs module.
+!! The emit calculates the correct equilibrium values here. However if you put an ibs command after this, the longitudinal values that the ibs gets as input are wrong!
+!! I am not sure how this works for a 3rd harmonic cavity.. Maybe it is better to calculate by hand or varify that it gives the correct values. 
+
+gg=beam->gamma;
+En=beam->energy;
+Cgg=0.0000884628;
+cc=299792458;
+Jx0=1.03158024;
+Jy0=1.00056875;
+Js0=1.97019933;
+
+hh=HARMON;
+
+U0=Cgg/(2*pi)*En^4*I2;
+
+!taux=2*En*RCIR/(Jx0*U0*cc);
+!tauy=2*En*RCIR/(Jy0*U0*cc);
+!taul=2*En*RCIR/(Js0*U0*cc);
+
+U0= 0.0; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+RCIR=TABLE(summ,LENGTH);
+Cq=3.8319*10^(-13);
+k=0.2998;
+
+DQ1=TABLE(summ,DQ1);
+DQ2=TABLE(summ,DQ2);
+ALFA=TABLE(summ,ALFA);
+ap=Alfa;
+zz= BEAM->CHARGE;
+ex0=beam->ex;
+sp0=beam->SIGE;
+ss0=beam->SIGT;
+ey0=beam->ey;
+
+show, ex0, ey0, sp0, ss0, E0,En , Vrf, U0, RCIR, PI, hh, betar,gamma,ap; 
+!test = sp0 * RCIR * SQRT(ap * En / (2 * PI * betar * h * SQRT(zz^2 * (Vrf/1000)^2 - U0^2)));
+!show, test;
+!stop;
+exi=ex0;
+eyi=ey0;
+spi=sp0;
+ssi=ss0;
+nn=5;
+!tt=taux/nn;
+tt=0.00039691707;
+tt=1.4259865297332067E-06;
+
+!! I set the RF voltage to zero, otherwise the energy spread and bunch length used by the ibs comment are wrong! 
+!! This is an internal bug of madx! In my sequence the RF voltage is named V0. 
+V0=0;
+!beam, npart=Nb, radiate=false; 
+
+show, beam;
+!stop;
+create,table=ibsiteration,column=i,time,exx,eyy,spp,sss,ex0,ey0,sp0,ss0,Nb,Tx,Ty,Tl;
+create,table=ibssteadystate,column=i,exn,eyn,spp,sss,ex0n,ey0n,sp0,ss0,Nb;
+option,-info;
+
+i=0;
+step = 50.;
+tt = 1.4259865297332067E-06 * step;
+time=i*tt;
+exx=ex0;
+eyy=ey0;
+spp=sp0;
+sss=ss0;
+Tx=0;
+Ty=0;
+Tl=0;
+fill,table=ibsiteration;
+
+show, exx, eyy, spp, sss;
+show, beam;
+!stop;
+
+i=1;
+!while (diff1>1e-8) 
+while (i<320) 
+{
+    delete,table=twiss,table=summ;  
+    !! I put the radiation off here as in order to have it on you need the RF on and then you get wrong input in the ibs module. 
+    resbeam;  
+    beam, particle=positron, energy=En,bunched,npart=Nb,kbunch=1;
+    beam->ex=exi;
+    beam->ey=eyi;
+    beam->sige=spi;
+    beam->sigt=ssi;
+    beam->et=ssi*spi;
+
+    twiss;
+    ibs,file="MADX_Output/ibs_2GHz.tfs";
+
+    !!!~Beam size growth times in [s]~!!!
+    Tx = 2 * ibs.tx;
+    Ty = 2 * ibs.ty;
+    Tl = 2 * ibs.tl;
+
+    show,beam;
+    show, exi, eyi, spi, ssi, Tx, Ty, Tl;
+    !! This is the emittance growth due to the IBS growth rates
+    time=tt*i;
+
+    exx = exi * exp(2 * tt / Tx);
+    eyy = eyi * exp(2 * tt / Ty);
+    spp = spi * exp(1 * tt / Tl);
+    sse = spp * betar^2;
+    sss = sse * RCIR * SQRT(ap * En / (2 * PI * betar * h * SQRT(zz^2 * (Vrf/1000)^2 - U0^2)));
+    !The bunch length tends to be a little different due to slightly different parameters
+    show, spp,spi,sss,ssi, En;
+
+    exi=exx;
+    eyi=eyy;
+    spi=spp;
+    ssi=sss;
+    fill,table=ibsiteration;
+    i=i+1;        
+};
+!! To see if the script runs correctly check if you have this file as output with all the itearation steps. 
+write,table=ibsiteration,file="MADX_Output/ibsiteration_only.tfs";
+
+    et=spp*sss*En*1e6;
+    et0=sp0*ss0*En*1e6;
+    exn=exx*gg*1e9;
+    eyn=eyy*gg*1e9;
+    ex0n=ex0*gg*1e9;
+    ey0n=ey0*gg*1e9;
+    
+    IBSx=exn/ex0n;
+    IBSy=eyn/ey0n;
+    IBSl=et/et0;
+    
+    fill,table=ibssteadystate;
+
+    !! This output file should have the steady state emittances 
+    write,table=ibssteadystate,file="MADX_Output/ibssteadystate_2GHz.tfs";
+    
+    show, i, ex0n, ey0n, sp0, ss0, et0, exn, eyn, spp, sss, et, IBSx, IBSy, IBSl, dq1, dq2,alfa, u0,harmon, taux, tauy, taul, gg;
+!stop;
+value, kqf1,kqf2;
+
+FILL, TABLE=TAB;
+WRITE, TABLE=TAB,file="MADX_Output/final_uni_2GHz.tfs";
+
+!};
+show, U0;
+
+stop;
+
+
+/***
