@@ -140,6 +140,6 @@ for i in range(0, turns_wanted, steps_update):
     Sig_Ei = Sig_Mi * beta_rel**2
     bli = BunchLength(Circumference, h, En, SlipF, Sig_Ei, beta_rel, V0, U0, Z)
 
-#np.savetxt(r'./output/Nagaitsev.txt', np.array(beam_evol).T.tolist(), fmt='%e')
+np.savetxt(r'./output/Nagaitsev.txt', np.array(beam_evol).T.tolist(), fmt='%e')
 #np.savetxt(r'./output/Piwinski.txt', np.array(beam_evol).T.tolist(), fmt='%e')
 
