@@ -8,4 +8,4 @@ Analytical Models:
 
 Kick Implementations:
 * Simplified Kick (Above Transition)
-* Kinetic Theory (Still under development)
+* Kinetic Theory (Still under benchmarking)
